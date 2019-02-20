@@ -385,6 +385,37 @@ Cypress.Cookies.defaults({
 })
 ```
 
+If you wish to persist localStorage for one spec file, you can override the default settings by creating two commands within supports/command.js .
+
+```javascript
+let LOCAL_STORAGE_MEMORY = {};
+
+Cypress.Commands.add("saveLocalStorage", () => {
+  Object.keys(localStorage).forEach(key => {
+    LOCAL_STORAGE_MEMORY[key] = localStorage[key];
+  });
+});
+
+Cypress.Commands.add("restoreLocalStorage", () => {
+  Object.keys(LOCAL_STORAGE_MEMORY).forEach(key => {
+    localStorage.setItem(key, LOCAL_STORAGE_MEMORY[key]);
+  });
+});
+```
+
+These commands can then be used within your tests:
+```javascript
+beforeEach(() => {
+  cy.restoreLocalStorage();
+});
+
+afterEach(() => {
+  cy.saveLocalStorage();
+});
+```
+
+
+
 You **cannot** currently preserve localStorage across tests and can read more {% issue '461#issuecomment-325402086' 'here' %}.
 
 ## {% fa fa-angle-right %} Some of my elements animate in, how do I work around that?
